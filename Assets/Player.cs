@@ -25,35 +25,29 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // 移動
         var move = playerInput.actions["Move"].ReadValue<Vector2>();
-
         if (move.x != 0f)
         {
             rb.linearVelocityX = move.x * speed;
+
+            // 向き
+            var localScale = transform.localScale;
+            if (move.x < 0)
+            {
+                localScale.x = 1f;
+            }
+            else
+            {
+                localScale.x = -1f;
+            }
+            transform.localScale = localScale;
         }
 
+        // ジャンプ
         if (playerInput.actions["Jump"].WasPressedThisFrame())
         {
             rb.linearVelocityY = jumpSpeed;
-        }
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        const float damage = 5f;
-        const float damageSpeed = 8f;
-
-        foreach(var col in collision.contacts)
-        {
-            if(col.rigidbody?.tag == "Enemy")
-            {
-                // ダメージを受ける
-                life.Value -= damage;
-
-                // 相手の反対方向にrbの速度を設定
-                var dir = (rb.position - col.rigidbody.position).normalized;
-                rb.linearVelocity = dir * damageSpeed;
-            }
         }
     }
 }
